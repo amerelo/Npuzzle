@@ -1,10 +1,11 @@
-use std::env;
-use parser::Parser;
-
 mod parser;
 mod puzzle;
 
-fn main() {
+use std::env;
+use parser::pars::Parser;
+
+fn main()
+{
 	let args: Vec<String> = env::args().collect();
 	if args.len() == 2 {
 		let file_path = &args[1];

@@ -79,6 +79,6 @@ impl Parser {
 				println!("Information: {}", line);
 			}
 		}
-		Puzzle { len: puzz_len, }
+		Puzzle { len: puzz_len, numbers: numbers }
 	}
 }

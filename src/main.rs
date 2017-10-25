@@ -14,7 +14,7 @@ fn main()
 			if parser.is_file_valid() {
 				let puzzle = parser.parse_puzzle();
 				if puzzle.get_len() > 0 {
-					println!("Puzzle len: {}", puzzle.get_len())
+					println!("Puzzle len: {}, vector: {:?}", puzzle.get_len(), puzzle.get_numbers());
 				} else {
 					println!("Invalid puzzle !");
 				}

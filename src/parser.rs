@@ -9,28 +9,24 @@
 //    Updated: 2017/10/25 11:09:56 by frmarinh         ###   ########.fr        //
 //                                                                              //
 // **************************************************************************** //
-
-use std::env;
 use std::fs::File;
 
-mod parser;
-use parser::Parser;
+pub struct Parser {
+	file: String,
+	validity: bool,
+}
 
-fn main() {
-	let args: Vec<String> = env::args().collect();
-	if args.len() == 2 {
-		let file_path = &args[1];
-		if file_path.len() > 0 {
-			let parser: Parser = Parser::parse_file(file_path);
-			if parser.is_valid() {
-				println!("{:?}", file_path);
-			} else {
-				println!("The file {} is not valid.", parser.get_file());
-			}
-		} else {
-			println!("Invalid file name.");
-		}
-	} else {
-		println!("You must set a file as argument containing a puzzle to solve.");
+impl Parser {
+	pub fn parse_file(name: &String) -> (Parser) {
+		let mut f = File::open(name).expect("file not found");
+		Parser { file: name.clone(), validity: true, }
+	}
+
+	pub fn is_valid(&self) -> (bool) {
+		self.validity
+	}
+
+	pub fn get_file(&self) -> (&String) {
+		&self.file
 	}
 }

@@ -1,8 +1,8 @@
-mod parser;
-mod puzzle;
+mod parser_module;
+mod puzzle_module;
 
 use std::env;
-use parser::pars::Parser;
+use parser_module::parser::Parser;
 
 fn main()
 {
@@ -16,7 +16,7 @@ fn main()
 				if puzzle.get_len() > 0 {
 					println!("Puzzle len: {}", puzzle.get_len())
 				} else {
-					println!("Invalid puzzle in the file");
+					println!("Invalid puzzle !");
 				}
 				//println!("{}", parser.get_file_content());
 			} else {

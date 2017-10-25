@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::prelude::*;
 
 // use puzzle;
-use puzzle::puzzle::Puzzle;
+use puzzle_module::puzzle::Puzzle;
 
 pub struct Parser
 {
@@ -48,24 +48,32 @@ impl Parser {
 		&self.file
 	}
 
-	pub fn get_file_content(&self) -> (&String) {
-		&self.content
-	}
-
 	pub fn parse_puzzle(&self) -> (Puzzle) {
-		let mut puzz_len: i32 = 0;
+		let mut puzz_len: usize = 0;
+		let mut numbers: Vec<i32> = vec![];
 		let lines = self.content.lines();
 		for tuple in lines.enumerate() {
 			let line = tuple.1;
 			let ch = line.chars().nth(0).unwrap();
 			if ch != '#' {
 				if puzz_len == 0 && !line.contains(" ") && !line.contains("\t") {
-					match line.parse::<i32>() {
+					match line.parse::<usize>() {
 						Ok(n) => { puzz_len = n; }
 						Err(error) => { println!("Len of puzzle invalid: {}", error); break; }
 					}
-				} else {
-					println!("{}", line);
+				} else if puzz_len > 0 {
+					let line_numbers: Vec<&str> = line.split_whitespace().collect();
+					if line_numbers.len() == puzz_len {
+						for (i, &item) in line_numbers.iter().enumerate() {
+							match item.parse::<i32>() {
+								Ok(n) => { numbers.push(n); },
+								Err(error) => { println!("Number on the line invalid: {}", error);  }
+							}
+						}
+					} else {
+						println!("{:?} are invalid values for puzzle len {}", line_numbers, puzz_len);
+						puzz_len = 0;
+					}
 				}
 			} else {
 				println!("Information: {}", line);

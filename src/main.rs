@@ -25,8 +25,12 @@ fn main() {
 			let parser: Parser = Parser::new_file(file_path);
 			if parser.is_file_valid() {
 				let puzzle = parser.parse_puzzle();
-				puzzle.Salope();
-				println!("{}", parser.get_file_content());
+				if puzzle.get_len() > 0 {
+					println!("Puzzle len: {}", puzzle.get_len())
+				} else {
+					println!("Invalid puzzle in the file");
+				}
+				//println!("{}", parser.get_file_content());
 			} else {
 				println!("The file {} is not valid.", parser.get_file());
 			}

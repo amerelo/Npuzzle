@@ -15,7 +15,11 @@ pub struct Puzzle {
 }
 
 impl Puzzle {
-	pub fn Salope(&self) -> () {
-		println!("BONJOUR");
+	pub fn test(&self) -> () {
+
+	}
+
+	pub fn get_len(&self) -> (i32) {
+		self.len
 	}
 }

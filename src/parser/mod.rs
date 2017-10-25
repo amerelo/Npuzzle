@@ -1,20 +1,9 @@
-// **************************************************************************** //
-//                                                                              //
-//                                                         :::      ::::::::    //
-//    parser.rs                                          :+:      :+:    :+:    //
-//                                                     +:+ +:+         +:+      //
-//    By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+         //
-//                                                 +#+#+#+#+#+   +#+            //
-//    Created: 2017/10/25 11:09:53 by frmarinh          #+#    #+#              //
-//    Updated: 2017/10/25 11:09:56 by frmarinh         ###   ########.fr        //
-//                                                                              //
-// **************************************************************************** //
-
 use std::fs::File;
 use std::io::prelude::*;
-
 use super::puzzle::Puzzle;
-pub struct Parser {
+
+pub struct Parser
+{
 	file: String,
 	validity: bool,
 	content: String,

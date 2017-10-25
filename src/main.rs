@@ -7,13 +7,19 @@ use parser_module::parser::Parser;
 fn main()
 {
 	let args: Vec<String> = env::args().collect();
-	if args.len() == 2 {
+
+	if args.len() == 2
+	{
 		let file_path = &args[1];
-		if file_path.len() > 0 {
+		if file_path.len() > 0
+		{
 			let parser: Parser = Parser::new_file(file_path);
-			if parser.is_file_valid() {
+
+			if parser.is_file_valid()
+			{
 				let puzzle = parser.parse_puzzle();
-				if puzzle.get_len() > 0 {
+				if puzzle.get_len() > 0
+				{
 					println!("Puzzle len: {}, vector: {:?}", puzzle.get_len(), puzzle.get_numbers());
 				} else {
 					println!("Invalid puzzle !");

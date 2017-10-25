@@ -1,7 +1,7 @@
 // **************************************************************************** //
 //                                                                              //
 //                                                         :::      ::::::::    //
-//    parser.rs                                          :+:      :+:    :+:    //
+//    main.rs                                            :+:      :+:    :+:    //
 //                                                     +:+ +:+         +:+      //
 //    By: frmarinh <frmarinh@student.42.fr>          +#+  +:+       +#+         //
 //                                                 +#+#+#+#+#+   +#+            //
@@ -11,19 +11,22 @@
 // **************************************************************************** //
 
 use std::env;
-use std::fs::File;
 
 mod parser;
 use parser::Parser;
+
+mod puzzle;
 
 fn main() {
 	let args: Vec<String> = env::args().collect();
 	if args.len() == 2 {
 		let file_path = &args[1];
 		if file_path.len() > 0 {
-			let parser: Parser = Parser::parse_file(file_path);
-			if parser.is_valid() {
-				println!("{:?}", file_path);
+			let parser: Parser = Parser::new_file(file_path);
+			if parser.is_file_valid() {
+				let puzzle = parser.parse_puzzle();
+				puzzle.Salope();
+				println!("{}", parser.get_file_content());
 			} else {
 				println!("The file {} is not valid.", parser.get_file());
 			}

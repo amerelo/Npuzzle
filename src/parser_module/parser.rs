@@ -51,6 +51,7 @@ impl Parser {
 	pub fn parse_puzzle(&self) -> (Puzzle) {
 		let mut puzz_len: usize = 0;
 		let mut numbers: Vec<i32> = vec![];
+		let mut lines_count: usize = 0;
 		let lines = self.content.lines();
 		for tuple in lines.enumerate() {
 			let line = tuple.1;
@@ -66,10 +67,11 @@ impl Parser {
 					if line_numbers.len() == puzz_len {
 						for (i, &item) in line_numbers.iter().enumerate() {
 							match item.parse::<i32>() {
-								Ok(n) => { numbers.push(n); },
-								Err(error) => { println!("Number on the line invalid: {}", error);  }
+								Ok(n) => numbers.push(n),
+								Err(error) => { println!("Number on the line invalid: {}, index: {}", error, i);  }
 							}
 						}
+						lines_count += 1;
 					} else {
 						println!("{:?} are invalid values for puzzle len {}", line_numbers, puzz_len);
 						puzz_len = 0;
@@ -77,6 +79,10 @@ impl Parser {
 				}
 			} else {
 				println!("Information: {}", line);
+			}
+			if lines_count > puzz_len {
+				puzz_len = 0;
+				break;
 			}
 		}
 		Puzzle { len: puzz_len, numbers: numbers }

@@ -1,9 +1,9 @@
 The goal of this project is to solve the N-puzzle ("taquin" in French) game using the A*
-search algorithm or one of its variants.<br/><br/>
+search algorithm or one of its variants.<br/>
 
 You start with a square board made up of N*N cells. One of these cells will be empty,
 the others will contain numbers, starting from 1, that will be unique in this instance of
-the puzzle.</br><br/>
+the puzzle.</br>
 
 Your search algorithm will have to find a valid sequence of moves in order to reach the
 final state, a.k.a the "snail solution", which depends on the size of the puzzle (Example

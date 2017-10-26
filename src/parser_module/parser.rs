@@ -48,8 +48,7 @@ impl Parser {
 		&self.file
 	}
 
-	pub fn parse_puzzle(&self) -> (Puzzle)
-	{
+	pub fn parse_puzzle(&self) -> (Puzzle) {
 		let mut puzz_len: usize = 0;
 		let mut numbers: Vec<i32> = vec![];
 		let mut lines_count: usize = 0;

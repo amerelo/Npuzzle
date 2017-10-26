@@ -1,16 +1,18 @@
 mod parser_module;
 mod puzzle_module;
 mod window_module;
+mod gameview_module;
 
 extern crate piston_window;
+extern crate opengl_graphics;
 
 use std::env;
 use parser_module::parser::Parser;
 use window_module::window;
+use gameview_module::gameview;
 
 fn main()
 {
-	window::make_win();
 	let args: Vec<String> = env::args().collect();
 
 	if args.len() == 2
@@ -25,11 +27,10 @@ fn main()
 				let puzzle = parser.parse_puzzle();
 				if puzzle.get_len() > 0
 				{
-					println!("Puzzle len: {}, vector: {:?}", puzzle.get_len(), puzzle.get_numbers());
+					window::create_window(&puzzle, [885; 2]);
 				} else {
 					println!("Invalid puzzle !");
 				}
-				//println!("{}", parser.get_file_content());
 			} else {
 				println!("The file {} is not valid.", parser.get_file());
 			}

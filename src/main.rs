@@ -5,6 +5,7 @@ mod gameview_module;
 
 extern crate piston_window;
 extern crate opengl_graphics;
+extern crate gfx_device_gl;
 
 use std::env;
 use parser_module::parser::Parser;

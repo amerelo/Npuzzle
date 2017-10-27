@@ -52,10 +52,8 @@ pub fn draw_section_borders<G: Graphics>(puzzle: &Puzzle, c: &Context, g: &mut G
 
 		let vline = [x, position[1], x, y2];
 		section_edge.draw(vline, &c.draw_state, c.transform, g);
-		println!("vertical: {:?}", vline);
 
 		let hline = [position[0], y, x2, y];
-		println!("horizontal: {:?}", hline);
 		section_edge.draw(hline, &c.draw_state, c.transform, g);
 	}
 }

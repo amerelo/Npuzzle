@@ -42,6 +42,8 @@ pub fn create_window(puzzle: &Puzzle, window_size: [u32; 2])
 				if item != 0 {
 					let text = text::Text::new_color([0.0, 0.7, 0.7, 1.0], 16);
 					text.draw(&item.to_string(), &mut glyphs, &c.draw_state, c.transform.trans(x, y), g);
+				} else {
+					Rectangle::new([0.3, 0.05, 0.2, 1.0]).draw([x - 20.0, y - 20.0, square_len / 2.0, square_len / 2.0], &c.draw_state, c.transform, g);
 				}
 				l += 1;
 			}

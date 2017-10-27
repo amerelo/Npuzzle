@@ -8,6 +8,8 @@ pub fn create_window(puzzle: &Puzzle, window_size: [u32; 2])
 {
 	let mut window: PistonWindow = WindowSettings::new ("Npuzzle", window_size)
 	.exit_on_esc(true)
+	.resizable(false)
+	.decorated(false)
 	.build()
 	.unwrap();
 

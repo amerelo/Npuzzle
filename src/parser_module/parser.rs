@@ -67,7 +67,11 @@ impl Parser {
 					if line_numbers.len() == puzz_len {
 						for (i, &item) in line_numbers.iter().enumerate() {
 							match item.parse::<i32>() {
-								Ok(n) => numbers.push(n),
+								Ok(n) => { if !numbers.iter().any(|&x| x == n) { numbers.push(n) } else {
+									println!("The value {} are set multiples times in the puzzle.", n);
+									puzz_len = 0;
+									break;
+								} },
 								Err(error) => { println!("Number on the line invalid: {}, index: {}", error, i);  }
 							}
 						}
@@ -83,6 +87,11 @@ impl Parser {
 			if lines_count > puzz_len {
 				puzz_len = 0;
 				break;
+			}
+		}
+		if puzz_len > 0 {
+			if numbers.len() != puzz_len * puzz_len || !numbers.iter().any(|&x| x == 0) {
+				puzz_len = 0;
 			}
 		}
 		Puzzle { len: puzz_len, numbers: numbers }

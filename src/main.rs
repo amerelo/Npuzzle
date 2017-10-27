@@ -26,11 +26,11 @@ fn main()
 			if parser.is_file_valid()
 			{
 				let puzzle = parser.parse_puzzle();
-				if puzzle.get_len() > 0
+				if puzzle.get_len() >= 3 && puzzle.get_len() <= 20
 				{
 					window::create_window(&puzzle, [885; 2]);
 				} else {
-					println!("Invalid puzzle !");
+					println!("Invalid value or invalid length. (the length must be between 3 - 20)");
 				}
 			} else {
 				println!("The file {} is not valid.", parser.get_file());

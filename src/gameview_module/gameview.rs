@@ -1,6 +1,6 @@
 use piston_window::*;
 use puzzle_module::puzzle::Puzzle;
-use gfx_device_gl::*;
+// use gfx_device_gl::*;
 
 pub fn grid_gen<G: Graphics>(puzzle: &Puzzle, c: &Context, g: &mut G, glyphs: &mut Glyphs) -> (f64)
 {

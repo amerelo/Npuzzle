@@ -26,7 +26,7 @@ fn main()
 			if parser.is_file_valid()
 			{
 				let puzzle = parser.parse_puzzle();
-				puzzle.get_last_pos(puzzle.get_len() as i32);
+				puzzle.solve_puzzle();
 				if puzzle.get_len() >= 3 && puzzle.get_len() <= 20
 				{
 					window::create_window(&puzzle, [885; 2]);

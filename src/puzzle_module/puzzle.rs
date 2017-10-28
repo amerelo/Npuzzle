@@ -20,7 +20,22 @@ impl Puzzle {
 		&self.numbers
 	}
 
-	pub fn get_last_pos(&self, size: i32)
+	pub fn solve_puzzle(&self)
+	{
+		let finalboard: Vec<Position> = self.get_last_pos(self.len as i32);
+
+		println!("get final pos of 8 {:?}", finalboard[8 - 1]);
+
+		println!("get final pos of 1 {:?}", finalboard[1 - 1]);
+
+		println!("get final pos of 15 {:?}", finalboard[15 - 1]);
+
+		// println!("|vec {:?}", finalboard);
+	}
+
+
+	//find better solution
+	fn get_last_pos(&self, size: i32) -> (Vec<Position>)
 	{
 		let mut board: Vec<Position> = Vec::new();
 
@@ -55,10 +70,10 @@ impl Puzzle {
 					}
 				}
 			}
-			// println!("iterator {}", x);
 			board.push(elem);
 		}
-		println!("|vec {:?}", board);
-		println!("size {} vec size {}", size, board.len());
+		board
+		// println!("|vec {:?}", board);
+		// println!("size {} vec size {}", size, board.len());
 	}
 }

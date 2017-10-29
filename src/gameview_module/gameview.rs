@@ -2,7 +2,7 @@ use piston_window::*;
 use puzzle_module::puzzle::Puzzle;
 // use gfx_device_gl::*;
 
-pub fn grid_gen<G: Graphics>(puzzle: &Puzzle, c: &Context, g: &mut G, glyphs: &mut Glyphs) -> (f64)
+pub fn grid_gen<G: Graphics>(puzzle: &Puzzle, c: &Context, g: &mut G) -> ()
 {
 	let draw_size = 880.0;
 	let start_position = [0.0; 2];
@@ -11,7 +11,6 @@ pub fn grid_gen<G: Graphics>(puzzle: &Puzzle, c: &Context, g: &mut G, glyphs: &m
 	draw_cell_borders(&puzzle, &c, g, draw_size, start_position, colors_draw);
 	draw_section_borders(&puzzle, &c, g, draw_size, start_position, colors_draw);
 	Rectangle::new_border(colors_draw, 3.0).draw([start_position[0], start_position[1], draw_size, draw_size], &c.draw_state, c.transform, g);
-	return get_square_len(&puzzle, start_position, draw_size);
 }
 
 pub fn draw_cell_borders<G: Graphics>(puzzle: &Puzzle, c: &Context, g: &mut G, size: f64, position: [f64; 2], colors: [f32; 4]) -> ()

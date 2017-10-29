@@ -3,6 +3,7 @@ use std::io::prelude::*;
 
 // use puzzle;
 use puzzle_module::puzzle::Puzzle;
+use puzzle_module::puzzle::Number;
 
 pub struct Parser
 {
@@ -46,6 +47,15 @@ impl Parser {
 
 	pub fn get_file(&self) -> (&String) {
 		&self.file
+	}
+
+	pub fn convert_numbers(&self, numbers: &Vec<i32>) -> (Vec<Number>)
+	{
+		let mut numbers_pos: Vec<Number> = vec![];
+		for (_i, &item) in numbers.iter().enumerate() {
+			numbers_pos.push(Number { value: item, x:0.0, y:0.0 });
+		}
+		return numbers_pos;
 	}
 
 	pub fn parse_puzzle(&self) -> (Puzzle) {
@@ -94,6 +104,6 @@ impl Parser {
 				puzz_len = 0;
 			}
 		}
-		Puzzle { len: puzz_len, numbers: numbers }
+		Puzzle { len: puzz_len, numbers: self.convert_numbers(&numbers) }
 	}
 }

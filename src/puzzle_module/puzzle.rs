@@ -1,6 +1,8 @@
 use gameview_module::gameview;
 
+
 #[derive(Debug)]
+#[derive(Clone)]
 pub struct Number
 {
 	pub value: i32,
@@ -15,6 +17,7 @@ impl Number {
 	}
 }
 
+/////
 pub struct Puzzle {
 	pub len: usize,
 	pub numbers: Vec<Number>,
@@ -63,17 +66,36 @@ impl Puzzle
 		self.init_pos(); // init Vec<Number> with value and graphics positions
 		let finalboard: Vec<Number> = self.get_last_pos(self.len as i32);
 
-		self.get_heuristic(finalboard);
-		// println!("|vec {:?}", finalboard);
+		let mut testv: Vec<i32> = Vec::new();
+
+		self.test_recursive(&mut testv, 0);
+		println!("last vec = {:?}", testv);
+		// self.a_star(finalboard);
+		// self.get_manhattan_heuristic(finalboard);
 	}
+
+	fn test_recursive(&self, vec: &mut Vec<i32>, i: i32) -> (bool)
+	{
+		println!("vec = {:?}", vec);
+		vec.push(i);
+		if i < 10 {
+			self.test_recursive(vec, i + 1);
+		}
+		return true;
+	}
+
 
 	// fn a_star(&self, finalboard: Vec<Number>)
 	// {
+	// 	let mut test: Vec<Number> = self.numbers.to_vec();
 	//
+	// 	println!("|vec1 {:?}", finalboard);
+	//
+	// 	println!("\n|test {:?}", test);
 	// }
 
-	fn get_heuristic(&self, finalboard: Vec<Number>)
-	{
+	// fn get_manhattan_heuristic(&self, finalboard: Vec<Number>)
+	// {
 		// let mut h: i32 = 0;
 
 		// return abs(a.x - b.x) + abs(a.y - b.y)
@@ -87,22 +109,28 @@ impl Puzzle
 		// }
 
 		// println!("heuristic {} ", h);
-	}
+	// }
 
 	//find better solution
 	fn get_last_pos(&self, size: i32) -> (Vec<Number>)
 	{
 		let mut board: Vec<Number> = Vec::new();
 
+		let last_elem = (size * size) + 1;
 		let mut max_x = (size - 1) as f64;
 		let mut min_y = 0.0;
 		let mut c_x = 0.0;
 		let mut c_y = 0.0;
 		let mut r = true;
 
-		for x in 1..(size * size) + 1
+		for x in 1..last_elem
 		{
-			let elem = Number {value: x, x: c_x, y: c_y};
+			let elem = if x != last_elem {
+				Number {value: x, x: c_x, y: c_y}
+			} else {
+				Number {value: 0, x: c_x, y: c_y}
+			};
+
 			if r == true {
 				if c_x < max_x {
 					c_x += 1.0;
@@ -127,7 +155,6 @@ impl Puzzle
 			}
 			board.push(elem);
 		}
-		println!("|vec {:?}", board);
 		return board;
 	}
 }

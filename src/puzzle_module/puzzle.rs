@@ -10,7 +10,8 @@ struct  Position
 	y: i32,
 }
 
-impl Puzzle {
+impl Puzzle
+{
 
 	pub fn get_len(&self) -> (usize) {
 		self.len
@@ -24,15 +25,35 @@ impl Puzzle {
 	{
 		let finalboard: Vec<Position> = self.get_last_pos(self.len as i32);
 
-		println!("get final pos of 8 {:?}", finalboard[8 - 1]);
-
-		println!("get final pos of 1 {:?}", finalboard[1 - 1]);
-
-		println!("get final pos of 15 {:?}", finalboard[15 - 1]);
+		self.get_heuristic(finalboard);
+		// println!("get final pos of 8 {:?}", finalboard[8 - 1]);
+		// println!("get final pos of 1 {:?}", finalboard[1 - 1]);
+		// println!("get final pos of 15 {:?}", finalboard[15 - 1]);
 
 		// println!("|vec {:?}", finalboard);
 	}
 
+	// fn a_star(&self, finalboard: Vec<Position>)
+	// {
+	//
+	// }
+
+	fn get_heuristic(&self, finalboard: Vec<Position>)
+	{
+		// let mut h: i32 = 0;
+
+		// return abs(a.x - b.x) + abs(a.y - b.y)
+
+		// for (i, elem) in self.numbers.iter().enumerate()
+		// {
+		// 	if *elem != 0
+		// 	{
+		// 		println!("final pos of {} is  {:?} ", elem, finalboard[*elem as usize - 1]);
+		// 	}
+		// }
+
+		// println!("heuristic {} ", h);
+	}
 
 	//find better solution
 	fn get_last_pos(&self, size: i32) -> (Vec<Position>)

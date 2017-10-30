@@ -104,6 +104,6 @@ impl Parser {
 				puzz_len = 0;
 			}
 		}
-		Puzzle { len: puzz_len, numbers: self.convert_numbers(&numbers) }
+		Puzzle { len: puzz_len, numbers: self.convert_numbers(&numbers), open_list: vec![], close_list: vec![], final_list: vec![] }
 	}
 }

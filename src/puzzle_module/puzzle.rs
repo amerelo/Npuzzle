@@ -1,6 +1,5 @@
 use gameview_module::gameview;
 
-
 #[derive(Debug)]
 #[derive(Clone)]
 pub struct Number
@@ -8,6 +7,7 @@ pub struct Number
 	pub value: i32,
 	pub x: f64,
 	pub y: f64,
+	// pub heuristic: i32,
 }
 
 impl Number {
@@ -21,11 +21,13 @@ impl Number {
 pub struct Puzzle {
 	pub len: usize,
 	pub numbers: Vec<Number>,
+	pub open_list: Vec<Vec<Number>>,
+	pub close_list: Vec<Vec<Number>>,
+	pub final_list: Vec<Vec<Number>>,
 }
 
 impl Puzzle
 {
-
 	pub fn init_pos(&mut self) -> ()
 	{
 		let square_len:f64 = gameview::get_square_len(&self, [0.0; 2], 880.0);
@@ -66,33 +68,79 @@ impl Puzzle
 		self.init_pos(); // init Vec<Number> with value and graphics positions
 		let finalboard: Vec<Number> = self.get_last_pos(self.len as i32);
 
-		let mut testv: Vec<i32> = Vec::new();
+		// let mut open_list: Vec<Vec<Number>> = Vec::new();
+		// let mut close_list: Vec<Vec<Number>> = Vec::new();
+		self.close_list.push(self.numbers.to_vec());
 
-		self.test_recursive(&mut testv, 0);
-		println!("last vec = {:?}", testv);
-		// self.a_star(finalboard);
+		// println!("open_list {:?}", self.open_list);
+		// println!("close_list {:?}", self.close_list);
+		self.a_star(&finalboard);
+		// println!("close_list {:?}", close_list);
+		println!("open_list {:?}", self.open_list);
+		// self.test_recursive(&mut testv, 0);
+		// testv.pop();
+
 		// self.get_manhattan_heuristic(finalboard);
 	}
 
-	fn test_recursive(&self, vec: &mut Vec<i32>, i: i32) -> (bool)
+	// fn get_moving_numbers(&self, p: i32)
+	// {
+	// 	println!("size {}", self.len);
+	// 	println!("Down {}", p + self.len as i32);
+	// 	println!("Up {}", p - self.len as i32);
+	// 	println!("Lefty {} - L-1y {}", p / self.len as i32, (p - 1) / self.len as i32);
+	// 	println!("Right {} - R+1y {}", p / self.len as i32, (p + 1) / self.len as i32);
+	// }
+
+	fn move_elem(&mut self, board: &Vec<Number>, a:usize, b:usize)
 	{
-		println!("vec = {:?}", vec);
-		vec.push(i);
-		if i < 10 {
-			self.test_recursive(vec, i + 1);
-		}
-		return true;
+		let mut newboard: Vec<Number> = board.to_vec();
+		let tmp: i32 = board[a].value;
+		newboard[a].value = newboard[b].value;
+		newboard[b].value = tmp;
+		self.open_list.push(newboard.to_vec());
 	}
 
+	fn find_move(&mut self, board: &Vec<Number>)
+	{
+		let len = self.len;
+		let board_size = len * len;
 
-	// fn a_star(&self, finalboard: Vec<Number>)
-	// {
-	// 	let mut test: Vec<Number> = self.numbers.to_vec();
-	//
-	// 	println!("|vec1 {:?}", finalboard);
-	//
-	// 	println!("\n|test {:?}", test);
-	// }
+		for (i, elem) in board.iter().enumerate()
+		{
+			if elem.value == 0 {
+				println!("find move");
+				// self.get_moving_numbers(i as i32);
+				// println!("Up {}", i - self.len);
+				if i - len >= 0 {
+					self.move_elem(&board, i, i - len)
+				}
+				// println!("Down {}", i + len);
+				if i + len < board_size{
+					self.move_elem(&board, i, i + len)
+				}
+				// println!("Lefty {} - L-1y {}", i / len, (i - 1) / len);
+				if i / len == (i - 1) / len && i > 0{
+					self.move_elem(&board, i, i - 1)
+				}
+				// // println!("Right {} - R+1y {}", i / len, (i + 1) / len);
+				if i / len == (i + 1) / len && i < board_size{
+					self.move_elem(&board, i, i + 1)
+				}
+				break;
+			}
+		}
+	}
+
+	fn a_star(&mut self, finalboard: &Vec<Number>) -> (bool)
+	{
+		let mut test: Vec<Number> = self.numbers.to_vec();
+		self.find_move(&test);
+		// println!("|vec1 {:?}", finalboard);
+		// println!("\n|test {:?}", test);
+
+		return true;
+	}
 
 	// fn get_manhattan_heuristic(&self, finalboard: Vec<Number>)
 	// {
@@ -143,7 +191,7 @@ impl Puzzle
 				}
 			}
 			else {
-			 	if c_x > 0.0 {
+				if c_x > 0.0 {
 					c_x -= 1.0;
 				} else if c_x == 0.0 && c_y > min_y {
 					c_y -= 1.0;

@@ -17,7 +17,7 @@ impl Number {
 	}
 }
 
-/////
+//
 pub struct Puzzle {
 	pub len: usize,
 	pub numbers: Vec<Number>,
@@ -112,21 +112,21 @@ impl Puzzle
 				println!("find move");
 				// self.get_moving_numbers(i as i32);
 				// println!("Up {}", i - self.len);
-				if i - len >= 0 {
+				if (i as i32 - len as i32) >= 0 {
 					self.move_elem(&board, i, i - len)
 				}
 				// println!("Down {}", i + len);
-				if i + len < board_size{
-					self.move_elem(&board, i, i + len)
-				}
-				// println!("Lefty {} - L-1y {}", i / len, (i - 1) / len);
-				if i / len == (i - 1) / len && i > 0{
-					self.move_elem(&board, i, i - 1)
-				}
-				// // println!("Right {} - R+1y {}", i / len, (i + 1) / len);
-				if i / len == (i + 1) / len && i < board_size{
-					self.move_elem(&board, i, i + 1)
-				}
+				// if i + len < board_size{
+				// 	self.move_elem(&board, i, i + len)
+				// }
+				// // println!("Lefty {} - L-1y {}", i / len, (i - 1) / len);
+				// if i / len == (i - 1) / len && i > 0{
+				// 	self.move_elem(&board, i, i - 1)
+				// }
+				// // // println!("Right {} - R+1y {}", i / len, (i + 1) / len);
+				// if i / len == (i + 1) / len && i < board_size{
+				// 	self.move_elem(&board, i, i + 1)
+				// }
 				break;
 			}
 		}
@@ -136,6 +136,7 @@ impl Puzzle
 	{
 		let mut test: Vec<Number> = self.numbers.to_vec();
 		self.find_move(&test);
+
 		// println!("|vec1 {:?}", finalboard);
 		// println!("\n|test {:?}", test);
 

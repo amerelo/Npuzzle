@@ -13,24 +13,24 @@ pub fn get_vecs(puzzle: &Puzzle) -> (Vec<Vec<Number>>)
 
 	let mut copy: Vec<Number> = vec![];
 	for (_i, &ref item) in puzzle_nbr.iter().enumerate() {
-		copy.push(Number { value: item.value, x: item.x, y: item.y});
+		copy.push(Number { value: item.value, x: item.x, y: item.y, h: item.h});
 	}
 
 	let mut copy2: Vec<Number> = vec![];
 	for (i, &ref item) in puzzle_nbr.iter().enumerate() {
 		if i == 2 {
-			copy2.push(Number { value: item.value + 666, x: item.x, y: item.y});
+			copy2.push(Number { value: item.value + 666, x: item.x, y: item.y, h: item.h});
 		} else {
-			copy2.push(Number { value: item.value, x: item.x, y: item.y});
+			copy2.push(Number { value: item.value, x: item.x, y: item.y, h: item.h});
 		}
 	}
 
 	let mut copy3: Vec<Number> = vec![];
 	for (i, &ref item) in puzzle_nbr.iter().enumerate() {
 		if i == 2 {
-			copy3.push(Number { value: item.value + 667, x: item.x, y: item.y});
+			copy3.push(Number { value: item.value + 667, x: item.x, y: item.y, h: item.h});
 		} else {
-			copy3.push(Number { value: item.value, x: item.x, y: item.y});
+			copy3.push(Number { value: item.value, x: item.x, y: item.y, h: item.h});
 		}
 	}
 

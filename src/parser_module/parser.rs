@@ -53,7 +53,7 @@ impl Parser {
 	{
 		let mut numbers_pos: Vec<Number> = vec![];
 		for (_i, &item) in numbers.iter().enumerate() {
-			numbers_pos.push(Number { value: item, x:0.0, y:0.0 });
+			numbers_pos.push(Number { value: item, x:0.0, y:0.0, h: 0});
 		}
 		return numbers_pos;
 	}

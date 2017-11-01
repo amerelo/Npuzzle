@@ -7,8 +7,6 @@ pub struct Number
 	pub value: i32,
 	pub x: f64,
 	pub y: f64,
-	// pub posx: i32,
-	// pub posy: i32,
 	pub h: i32,
 	pub x_base: i32,
 	pub y_base: i32,
@@ -175,7 +173,7 @@ impl Puzzle
 
 	fn a_star(&mut self, finalboard: &Vec<Number>)
 	{
-		loop {
+		// loop {
 
 			let index = self.index_to_study();
 			let step = self.open_list[index].step + 1;
@@ -193,13 +191,11 @@ impl Puzzle
 			self.open_list.iter().enumerate().position(|t| t.0 == index).map(|e| self.open_list.remove(e));
 			// println!("len of open_list {:?}", self.open_list.len());
 			// println!("len of close_list {:?}", self.close_list.len());
-		}
+		// }
 	}
 
 	fn get_manhattan_heuristic(&mut self, finalboard: &Vec<Number>, index: usize)
 	{
-		let mut x: i32 = 0;
-		let mut y: i32 = 0;
 		let mut global_h = 0;
 
 		// return abs(a.x - b.x) + abs(a.y - b.y)
@@ -208,14 +204,10 @@ impl Puzzle
 		{
 			if e.value != 0
 			{
-				e.h = (x - finalboard[e.value as usize - 1].x as i32).abs() + (y - finalboard[e.value as usize - 1].y as i32).abs();
+				e.h = (e.x_base - finalboard[e.value as usize - 1].x as i32).abs() + (e.y_base - finalboard[e.value as usize - 1].y as i32).abs();
+				println!(" value {}, posx {}, posy {}, heuristic {}", e.value, e.x_base, e.y_base, e.h);
+				// println!("heuristic  {}", e.h);
 				global_h += e.h;
-			}
-			x += 1;
-			if x == self.len as i32
-			{
-				y += 1;
-				x = 0;
 			}
 		}
 		self.open_list[index].glob_heuristic = global_h;
@@ -296,6 +288,13 @@ impl Puzzle
 			}
 			board.push(elem);
 		}
+
+		// pub numbers: Vec<Number>,
+		// for elem in self.numbers.iter()
+		// {
+		// 	println!("number {:?}", elem);
+		// }
+
 		return board;
 	}
 }

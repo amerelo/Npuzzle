@@ -91,6 +91,28 @@ impl Puzzle
 		// println!("open_list {:?}", self.open_list);
 	}
 
+	fn in_close_list(&self, board: &Vec<Number>) ->(bool)
+	{
+		let mut diff = true;
+
+		'outer: for elem in self.close_list.iter() {
+			diff = false;
+			'inner: for (i, section) in elem.list.iter().enumerate() {
+				// print!("v {} vc {} ", board[i].value, section.value);
+				if board[i].value != section.value {
+					diff = true;
+					break 'inner;
+				}
+			}
+			if diff == false{
+				// println!("\nfalse");
+				return false;
+			}
+		}
+		// println!("\ntrue");
+		return diff;
+	}
+
 	fn move_elem(&mut self, finalboard: &Vec<Number>, board: &Vec<Number>, a:usize, b:usize, s: i32)
 	{
 		let mut newboard: Vec<Number> = board.to_vec();
@@ -99,17 +121,18 @@ impl Puzzle
 
 		newboard[a].value = newboard[b].value;
 		newboard[b].value = tmp;
+		if self.in_close_list(&newboard) {
+			let mut elem: Elem = Elem {
+				list: newboard.to_vec(),
+				glob_heuristic: 0,
+				step: s,
+			};
 
-		let mut elem: Elem = Elem {
-			list: newboard.to_vec(),
-			glob_heuristic: 0,
-			step: s,
-		};
-		// need to just modify M heuristic not all of the list
-		self.open_list.push(elem);
-		self.get_manhattan_heuristic(&finalboard, index);
+			// need to just modify M heuristic not all of the list
+			self.open_list.push(elem);
+			self.get_manhattan_heuristic(&finalboard, index);
+		}
 	}
-
 
 	// get zero pos previous this fn
 	fn find_move(&mut self, finalboard: &Vec<Number>, board: &Vec<Number>, step: i32)
@@ -120,19 +143,19 @@ impl Puzzle
 		for (i, elem) in board.iter().enumerate()
 		{
 			if elem.value == 0 {
-				// println!("Up {}", i - self.len);
+				// Up
 				if (i as i32 - len as i32) >= 0 {
 					self.move_elem(&finalboard, &board, i, i - len, step)
 				}
-				// println!("Down {}", i + len);
+				// Down
 				if i + len < board_size{
 					self.move_elem(&finalboard, &board, i, i + len, step)
 				}
-				// println!("Lefty {} - L-1y {}", i / len, (i - 1) / len);
+				// Left
 				if (i as i32 - 1) > 0 && i / len == (i - 1) / len {
 					self.move_elem(&finalboard, &board, i, i - 1, step)
 				}
-				// println!("Right {} - R+1y {}", i / len, (i + 1) / len);
+				// Right
 				if i / len == (i + 1) / len && i < board_size {
 					self.move_elem(&finalboard, &board, i, i + 1, step)
 				}
@@ -141,25 +164,27 @@ impl Puzzle
 		}
 	}
 
-	fn a_star(&mut self, finalboard: &Vec<Number>) -> (bool)
+	fn a_star(&mut self, finalboard: &Vec<Number>)
 	{
-		let index = self.index_to_study();
-		let step = self.open_list[index].step + 1;
-		let mut board_study: Elem = Elem {
-			list: self.open_list[index].list.to_vec(),
-			glob_heuristic: self.open_list[index].glob_heuristic,
-			step: self.open_list[index].step,
-		};
+		loop {
 
+			let index = self.index_to_study();
+			let step = self.open_list[index].step + 1;
 
-		self.get_manhattan_heuristic(&finalboard, index);
-		self.find_move(&finalboard, &board_study.list, step);
+			let mut board_study: Elem = Elem {
+				list: self.open_list[index].list.to_vec(),
+				glob_heuristic: self.open_list[index].glob_heuristic,
+				step: self.open_list[index].step,
+			};
 
-		println!("len of open_list {:?}", self.open_list.len());
-		self.close_list.push(board_study);
-		self.open_list.iter().enumerate().position(|t| t.0 == index).map(|e| self.open_list.remove(e));
-		println!("len of open_list {:?}", self.open_list.len());
-		return true;
+			self.get_manhattan_heuristic(&finalboard, index);
+			self.find_move(&finalboard, &board_study.list, step);
+
+			self.close_list.push(board_study);
+			self.open_list.iter().enumerate().position(|t| t.0 == index).map(|e| self.open_list.remove(e));
+			// println!("len of open_list {:?}", self.open_list.len());
+			// println!("len of close_list {:?}", self.close_list.len());
+		}
 	}
 
 	fn get_manhattan_heuristic(&mut self, finalboard: &Vec<Number>, index: usize)
@@ -174,10 +199,7 @@ impl Puzzle
 		{
 			if e.value != 0
 			{
-				// println!("final pos of {} is  {:?} ", self.open_list[index].value, finalboard[self.open_list[index].value as usize - 1]);
-				// println!("self.open_list[index] pos of x {} pos y is {} ", x, y);
 				e.h = (x - finalboard[e.value as usize - 1].x as i32).abs() + (y - finalboard[e.value as usize - 1].y as i32).abs();
-				// println!("self.open_list[index] heuristic {}  ", self.open_list[index].h);
 				global_h += e.h;
 			}
 			x += 1;
@@ -193,14 +215,31 @@ impl Puzzle
 	fn index_to_study(&self) -> (usize)
 	{
 		let mut index: usize = 0;
-		let heuristic: i32 = self.open_list[index].glob_heuristic;
+		let mut heuristic: i32 = self.open_list[index].glob_heuristic;
 
 		for (i, elem) in self.open_list.iter().enumerate()
 		{
+			// + step
 			if heuristic > elem.glob_heuristic {
+				heuristic = elem.glob_heuristic;
 				index = i;
 			}
 		}
+
+		println!("step {}", self.open_list[index].step);
+		println!("heuristic {}", heuristic);
+		for elem in self.open_list[index].list.iter() {
+			print!("{:?} ", elem.value);
+		}
+		println!("");
+		if heuristic == 0 {
+			println!("steps {:?}", self.open_list[index].step);
+			for elem in self.open_list[index].list.iter() {
+				println!("{:?}", elem.value);
+			}
+			::std::process::exit(0);
+		}
+
 		return index;
 	}
 

@@ -48,7 +48,8 @@ impl Puzzle
 		let mut y: f64 = start[1];
 		let mut x: f64;
 		let mut l: usize = 0;
-		let mut index: i32 = 0;
+		let mut base_x: i32 = 0;
+		let mut base_y: i32 = 0;
 		let puzzle_len = self.get_len();
 
 		for element in self.get_numbers().iter_mut() {
@@ -56,6 +57,8 @@ impl Puzzle
 				x = square_len / 2.0;
 				y += square_len;
 				l = 0;
+				base_y += 1;
+				base_x = 0;
 			} else {
 				x = start[0] + l as f64 / puzzle_len as f64 * 880.0;
 			}
@@ -64,9 +67,9 @@ impl Puzzle
 			} else {
 				element.update_pos(x - 20.0, y - 20.0);
 			}
-			element.update_base(index, index);
+			element.update_base(base_x, base_y);
 			l += 1;
-			index += 1;
+			base_x += 1;
 		}
 	}
 
@@ -82,18 +85,19 @@ impl Puzzle
 	{
 		println!("Solving the puzzle...");
 		self.init_pos(); // init Vec<Number> with value and graphics positions
-		let finalboard: Vec<Number> = self.get_last_pos(self.len as i32);
-		// self.close_list.push(self.numbers.to_vec());
-
-		let mut elem: Elem = Elem {
-			list: self.numbers.to_vec(),
-			glob_heuristic: 0,
-			step: 0,
-		};
-		self.open_list.push(elem);
-		self.get_manhattan_heuristic(&finalboard, 0);
-
-		self.a_star(&finalboard);
+		println!("{:?}", self.numbers);
+		// let finalboard: Vec<Number> = self.get_last_pos(self.len as i32);
+		// // self.close_list.push(self.numbers.to_vec());
+		//
+		// let mut elem: Elem = Elem {
+		// 	list: self.numbers.to_vec(),
+		// 	glob_heuristic: 0,
+		// 	step: 0,
+		// };
+		// self.open_list.push(elem);
+		// self.get_manhattan_heuristic(&finalboard, 0);
+		//
+		// self.a_star(&finalboard);
 		// println!("close_list {:?}", close_list);
 		// println!("open_list {:?}", self.open_list);
 	}

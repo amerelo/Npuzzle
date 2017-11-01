@@ -11,32 +11,32 @@ pub fn get_vecs(puzzle: &Puzzle) -> (Vec<Vec<Number>>)
 	let puzzle_nbr = &puzzle.numbers;
 	let mut test: Vec<Vec<Number>> = vec![];
 
-	let mut copy: Vec<Number> = vec![];
-	for (_i, &ref item) in puzzle_nbr.iter().enumerate() {
-		copy.push(Number { value: item.value, x: item.x, y: item.y, h: item.h});
-	}
-
-	let mut copy2: Vec<Number> = vec![];
-	for (i, &ref item) in puzzle_nbr.iter().enumerate() {
-		if i == 2 {
-			copy2.push(Number { value: item.value + 666, x: item.x, y: item.y, h: item.h});
-		} else {
-			copy2.push(Number { value: item.value, x: item.x, y: item.y, h: item.h});
-		}
-	}
-
-	let mut copy3: Vec<Number> = vec![];
-	for (i, &ref item) in puzzle_nbr.iter().enumerate() {
-		if i == 2 {
-			copy3.push(Number { value: item.value + 667, x: item.x, y: item.y, h: item.h});
-		} else {
-			copy3.push(Number { value: item.value, x: item.x, y: item.y, h: item.h});
-		}
-	}
-
-	test.push(copy);
-	test.push(copy2);
-	test.push(copy3);
+	// let mut copy: Vec<Number> = vec![];
+	// for (_i, &ref item) in puzzle_nbr.iter().enumerate() {
+	// 	copy.push(Number { value: item.value, x: item.x, y: item.y, h: item.h});
+	// }
+	//
+	// let mut copy2: Vec<Number> = vec![];
+	// for (i, &ref item) in puzzle_nbr.iter().enumerate() {
+	// 	if i == 2 {
+	// 		copy2.push(Number { value: item.value + 666, x: item.x, y: item.y, h: item.h});
+	// 	} else {
+	// 		copy2.push(Number { value: item.value, x: item.x, y: item.y, h: item.h});
+	// 	}
+	// }
+	//
+	// let mut copy3: Vec<Number> = vec![];
+	// for (i, &ref item) in puzzle_nbr.iter().enumerate() {
+	// 	if i == 2 {
+	// 		copy3.push(Number { value: item.value + 667, x: item.x, y: item.y, h: item.h});
+	// 	} else {
+	// 		copy3.push(Number { value: item.value, x: item.x, y: item.y, h: item.h});
+	// 	}
+	// }
+	//
+	// test.push(copy);
+	// test.push(copy2);
+	// test.push(copy3);
 	return test;
 }
 

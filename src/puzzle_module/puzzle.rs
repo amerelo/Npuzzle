@@ -10,12 +10,18 @@ pub struct Number
 	// pub posx: i32,
 	// pub posy: i32,
 	pub h: i32,
+	pub x_base: i32,
+	pub y_base: i32,
 }
 
 impl Number {
 	pub fn update_pos(&mut self, x: f64, y: f64) {
 		self.x = x;
 		self.y = y;
+	}
+	pub fn update_base(&mut self, x_base: i32, y_base: i32) {
+		self.x_base = x_base;
+		self.y_base = y_base;
 	}
 }
 
@@ -44,6 +50,7 @@ impl Puzzle
 		let mut y: f64 = start[1];
 		let mut x: f64;
 		let mut l: usize = 0;
+		let mut index: i32 = 0;
 		let puzzle_len = self.get_len();
 
 		for element in self.get_numbers().iter_mut() {
@@ -59,7 +66,9 @@ impl Puzzle
 			} else {
 				element.update_pos(x - 20.0, y - 20.0);
 			}
+			element.update_base(index, index);
 			l += 1;
+			index += 1;
 		}
 	}
 
@@ -258,9 +267,9 @@ impl Puzzle
 		for x in 1..last_elem
 		{
 			let elem = if x != last_elem {
-				Number {value: x, x: c_x, y: c_y, h: 0}
+				Number {value: x, x: c_x, y: c_y, h: 0, x_base: 0, y_base: 0}
 			} else {
-				Number {value: 0, x: c_x, y: c_y, h: 0}
+				Number {value: 0, x: c_x, y: c_y, h: 0, x_base: 0, y_base: 0}
 			};
 
 			if r == true {

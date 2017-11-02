@@ -28,6 +28,8 @@ pub struct Elem {
 	pub list: Vec<Number>,
 	pub glob_heuristic: i32,
 	pub step: i32,
+	pub id: i32,
+	pub p_id: i32,
 }
 
 pub struct Puzzle {
@@ -85,19 +87,20 @@ impl Puzzle
 	{
 		println!("Solving the puzzle...");
 		self.init_pos(); // init Vec<Number> with value and graphics positions
-		println!("{:?}", self.numbers);
-		// let finalboard: Vec<Number> = self.get_last_pos(self.len as i32);
-		// // self.close_list.push(self.numbers.to_vec());
-		//
-		// let mut elem: Elem = Elem {
-		// 	list: self.numbers.to_vec(),
-		// 	glob_heuristic: 0,
-		// 	step: 0,
-		// };
-		// self.open_list.push(elem);
-		// self.get_manhattan_heuristic(&finalboard, 0);
-		//
-		// self.a_star(&finalboard);
+		// println!("{:?}", self.numbers);
+		let finalboard: Vec<Number> = self.get_last_pos(self.len as i32);
+		let mut elem: Elem = Elem {
+			list: self.numbers.to_vec(),
+			glob_heuristic: 0,
+			step: 0,
+			id: 0,
+			p_id: 0,
+		};
+
+		self.open_list.push(elem);
+		self.get_manhattan_heuristic(&finalboard, 0, 0);
+
+		self.a_star(&finalboard);
 		// println!("close_list {:?}", close_list);
 		// println!("open_list {:?}", self.open_list);
 	}
@@ -124,7 +127,7 @@ impl Puzzle
 		return diff;
 	}
 
-	fn move_elem(&mut self, finalboard: &Vec<Number>, board: &Vec<Number>, a:usize, b:usize, s: i32)
+	fn move_elem(&mut self, finalboard: &Vec<Number>, board: &Vec<Number>, a:usize, b:usize, s: i32, id: i32)
 	{
 		let mut newboard: Vec<Number> = board.to_vec();
 		let tmp: i32 = board[a].value;
@@ -133,20 +136,22 @@ impl Puzzle
 		newboard[a].value = newboard[b].value;
 		newboard[b].value = tmp;
 		if self.in_close_list(&newboard) {
-			let mut elem: Elem = Elem {
+			let elem: Elem = Elem {
 				list: newboard.to_vec(),
 				glob_heuristic: 0,
 				step: s,
+				id: 0,
+				p_id: id,
 			};
 
 			// need to just modify M heuristic not all of the list
 			self.open_list.push(elem);
-			self.get_manhattan_heuristic(&finalboard, index);
+			self.get_manhattan_heuristic(&finalboard, index, s);
 		}
 	}
 
 	// get zero pos previous this fn
-	fn find_move(&mut self, finalboard: &Vec<Number>, board: &Vec<Number>, step: i32)
+	fn find_move(&mut self, finalboard: &Vec<Number>, board: &Vec<Number>, step: i32, id: i32)
 	{
 		let len = self.len;
 		let board_size = len * len;
@@ -156,94 +161,147 @@ impl Puzzle
 			if elem.value == 0 {
 				// Up
 				if (i as i32 - len as i32) >= 0 {
-					self.move_elem(&finalboard, &board, i, i - len, step)
+					self.move_elem(&finalboard, &board, i, i - len, step, id)
 				}
 				// Down
 				if i + len < board_size{
-					self.move_elem(&finalboard, &board, i, i + len, step)
+					self.move_elem(&finalboard, &board, i, i + len, step, id)
 				}
 				// Left
 				if (i as i32 - 1) > 0 && i / len == (i - 1) / len {
-					self.move_elem(&finalboard, &board, i, i - 1, step)
+					self.move_elem(&finalboard, &board, i, i - 1, step, id)
 				}
 				// Right
 				if i / len == (i + 1) / len && i < board_size {
-					self.move_elem(&finalboard, &board, i, i + 1, step)
+					self.move_elem(&finalboard, &board, i, i + 1, step, id)
 				}
 				break;
 			}
 		}
 	}
 
+	fn get_final_path(&mut self, id: &mut i32)
+	{
+		let mut elem_id :i32 = *id;
+
+		loop {
+			for elem in self.close_list.iter() {
+				if elem.id == *id {
+					let board: Elem = Elem {
+						list: elem.list.to_vec(),
+						glob_heuristic: elem.glob_heuristic,
+						step: elem.step,
+						id: elem.id,
+						p_id: elem.p_id,
+					};
+					*id = elem.p_id;
+					elem_id = elem.id;
+					self.final_list.push(board);
+					break;
+				}
+			}
+			if elem_id == 0 {
+				break;
+			}
+		}
+
+		for elem in self.final_list.iter().rev()
+		{
+			let mut y: i32 = 0;
+			for val in elem.list.iter() {
+				if y != val.y_base {
+					y += 1;
+					println!("");
+				}
+				print!("{} ", val.value);
+			}
+			println!("\n");
+		}
+
+		// println!("step {}", self.open_list[index].step);
+		// println!("heuristic {}", heuristic);
+	}
+
 	fn a_star(&mut self, finalboard: &Vec<Number>)
 	{
-		// loop {
-
+		let mut id : i32 = 0;
+		// for x in 0..7{
+		loop {
+			// println!("loop {}", id);
 			let index = self.index_to_study();
 			let step = self.open_list[index].step + 1;
 
-			let mut board_study: Elem = Elem {
+			let board_study: Elem = Elem {
 				list: self.open_list[index].list.to_vec(),
 				glob_heuristic: self.open_list[index].glob_heuristic,
 				step: self.open_list[index].step,
+				id: id,
+				p_id: self.open_list[index].p_id,
 			};
 
-			self.get_manhattan_heuristic(&finalboard, index);
-			self.find_move(&finalboard, &board_study.list, step);
+			if self.open_list[index].glob_heuristic == 0 {
+				self.close_list.push(board_study);
+				self.open_list.iter().enumerate().position(|t| t.0 == index).map(|e| self.open_list.remove(e));
 
+				self.get_final_path(&mut id);
+				break;
+			}
+
+			self.find_move(&finalboard, &board_study.list, step, id);
 			self.close_list.push(board_study);
 			self.open_list.iter().enumerate().position(|t| t.0 == index).map(|e| self.open_list.remove(e));
-			// println!("len of open_list {:?}", self.open_list.len());
-			// println!("len of close_list {:?}", self.close_list.len());
-		// }
+			id += 1;
+		}
+		// println!("len of open_list {:?}", self.open_list.len());
+		// println!("len of close_list {:?}", self.close_list.len());
 	}
 
-	fn get_manhattan_heuristic(&mut self, finalboard: &Vec<Number>, index: usize)
+	fn get_manhattan_heuristic(&mut self, finalboard: &Vec<Number>, index: usize, step: i32)
 	{
 		let mut global_h = 0;
 
 		// return abs(a.x - b.x) + abs(a.y - b.y)
-	// need real x an y in the list to do less op
 		for e in self.open_list[index].list.iter_mut()
 		{
 			if e.value != 0
 			{
 				e.h = (e.x_base - finalboard[e.value as usize - 1].x as i32).abs() + (e.y_base - finalboard[e.value as usize - 1].y as i32).abs();
-				println!(" value {}, posx {}, posy {}, heuristic {}", e.value, e.x_base, e.y_base, e.h);
-				// println!("heuristic  {}", e.h);
+				// e.h += (e.x_base - finalboard[e.value as usize - 1].x_base as i32).abs() + (e.y_base - finalboard[e.value as usize - 1].y_base as i32).abs();
 				global_h += e.h;
 			}
+			// println!(" value {}, posx {}, posy {}, heuristic {}", e.value, e.x_base, e.y_base, e.h);
 		}
+		// println!("G_heuristic {} step {}", global_h, step);
 		self.open_list[index].glob_heuristic = global_h;
 	}
 
 	fn index_to_study(&self) -> (usize)
 	{
 		let mut index: usize = 0;
+		// let mut step: i32 = self.open_list[index].step;
 		let mut heuristic: i32 = self.open_list[index].glob_heuristic;
 
 		for (i, elem) in self.open_list.iter().enumerate()
 		{
-			// + step
-			if heuristic > elem.glob_heuristic {
+			// if heuristic + step > elem.glob_heuristic + elem.step{
+			if heuristic >= elem.glob_heuristic {
+				// step = elem.step;
 				heuristic = elem.glob_heuristic;
 				index = i;
 			}
 		}
 
-		println!("step {}", self.open_list[index].step);
-		println!("heuristic {}", heuristic);
-		for elem in self.open_list[index].list.iter() {
-			print!("{:?} ", elem.value);
-		}
-		println!("");
-		if heuristic == 0 {
-			println!("steps {:?}", self.open_list[index].step);
-			for elem in self.open_list[index].list.iter() {
-				println!("{:?}", elem.value);
-			}
-			::std::process::exit(0);
-		}
+		// println!("step {}", self.open_list[index].step);
+		// println!("heuristic {}", heuristic);
+		// let mut y: i32 = 0;
+		// for elem in self.open_list[index].list.iter() {
+		// 	if y != elem.y_base {
+		// 		y += 1;
+		// 		println!("");
+		// 	}
+		// 	print!("{} ", elem.value);
+		// }
+		// println!("\n");
 
 		return index;
 	}
@@ -293,11 +351,13 @@ impl Puzzle
 			board.push(elem);
 		}
 
-		// pub numbers: Vec<Number>,
-		// for elem in self.numbers.iter()
-		// {
-		// 	println!("number {:?}", elem);
-		// }
+		for elem in self.numbers.iter()
+		{
+			if elem.value != 0 {
+				board[elem.value as usize -1].x_base = elem.x_base;
+				board[elem.value as usize -1].y_base = elem.y_base;
+			}
+		}
 
 		return board;
 	}

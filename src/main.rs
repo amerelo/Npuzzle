@@ -9,7 +9,32 @@ extern crate gfx_device_gl;
 
 use std::env;
 use parser_module::parser::Parser;
+use puzzle_module::puzzle::Puzzle;
 use window_module::window;
+
+fn puzzle_3_size(board: &Puzzle) ->(bool)
+{
+	let mut inv_count: i32 = 0;
+
+	for w in 0..board.numbers.len()
+	{
+		for z in (w + 1)..board.numbers.len()
+		{
+			if board.numbers[w].value > board.numbers[z].value {
+				inv_count += 1;
+			}
+		}
+	}
+	return inv_count % 2 == 0;
+}
+
+fn is_solvable(board: &Puzzle) ->(bool)
+{
+	if board.len == 3 {
+		return puzzle_3_size(board);
+	}
+	return true;
+}
 
 fn main()
 {
@@ -25,12 +50,17 @@ fn main()
 			if parser.is_file_valid()
 			{
 				let mut puzzle = parser.parse_puzzle();
-				if puzzle.get_len() >= 3 && puzzle.get_len() <= 20
-				{
-					puzzle.solve_puzzle();
-					window::create_window(puzzle, [885, 950]);
-				} else {
-					println!("Invalid value or invalid length. (the length must be between 3 - 20)");
+				if is_solvable(&puzzle) {
+					println!("Puzzle not Solvable");
+				}
+				else {
+					if puzzle.get_len() >= 3 && puzzle.get_len() <= 20
+					{
+						puzzle.solve_puzzle();
+						window::create_window(puzzle, [885, 950]);
+					} else {
+						println!("Invalid value or invalid length. (the length must be between 3 - 20)");
+					}
 				}
 			} else {
 				println!("The file {} is not valid.", parser.get_file());

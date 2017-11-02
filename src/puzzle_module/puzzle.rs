@@ -89,7 +89,7 @@ impl Puzzle
 		self.init_pos(); // init Vec<Number> with value and graphics positions
 		// println!("{:?}", self.numbers);
 		let finalboard: Vec<Number> = self.get_last_pos(self.len as i32);
-		let mut elem: Elem = Elem {
+		let elem: Elem = Elem {
 			list: self.numbers.to_vec(),
 			glob_heuristic: 0,
 			step: 0,
@@ -180,13 +180,14 @@ impl Puzzle
 		}
 	}
 
-	fn get_final_path(&mut self, id: &mut i32)
+	fn get_final_path(&mut self, last_id: &i32)
 	{
-		let mut elem_id :i32 = *id;
+		let mut id :i32 = *last_id;
+		let mut elem_id :i32 = id;
 
 		loop {
 			for elem in self.close_list.iter() {
-				if elem.id == *id {
+				if elem.id == id {
 					let board: Elem = Elem {
 						list: elem.list.to_vec(),
 						glob_heuristic: elem.glob_heuristic,
@@ -194,7 +195,7 @@ impl Puzzle
 						id: elem.id,
 						p_id: elem.p_id,
 					};
-					*id = elem.p_id;
+					id = elem.p_id;
 					elem_id = elem.id;
 					self.final_list.push(board);
 					break;
@@ -211,9 +212,8 @@ impl Puzzle
 	fn a_star(&mut self, finalboard: &Vec<Number>)
 	{
 		let mut id : i32 = 0;
-		// for x in 0..7{
 		loop {
-			// println!("loop {}", id);
+			println!("loop {}", id);
 			let index = self.index_to_study();
 			let step = self.open_list[index].step + 1;
 
@@ -229,7 +229,7 @@ impl Puzzle
 				self.close_list.push(board_study);
 				self.open_list.iter().enumerate().position(|t| t.0 == index).map(|e| self.open_list.remove(e));
 
-				self.get_final_path(&mut id);
+				self.get_final_path(&id);
 				break;
 			}
 
@@ -238,6 +238,7 @@ impl Puzzle
 			self.open_list.iter().enumerate().position(|t| t.0 == index).map(|e| self.open_list.remove(e));
 			id += 1;
 		}
+		println!("Maximum number of states ever represented in memory {}", id);
 		// println!("len of open_list {:?}", self.open_list.len());
 		// println!("len of close_list {:?}", self.close_list.len());
 	}

@@ -4,6 +4,7 @@ use std::io::prelude::*;
 // use puzzle;
 use puzzle_module::puzzle::Puzzle;
 use puzzle_module::puzzle::Number;
+use std::collections::HashMap;
 
 pub struct Parser
 {
@@ -104,6 +105,6 @@ impl Parser {
 				puzz_len = 0;
 			}
 		}
-		Puzzle { len: puzz_len, numbers: self.convert_numbers(&numbers), open_list: vec![], close_list: vec![], final_list: vec![] }
+		Puzzle { len: puzz_len, numbers: self.convert_numbers(&numbers), open_list: vec![], final_list: vec![], close_l: HashMap::new()}
 	}
 }

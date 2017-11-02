@@ -1,4 +1,5 @@
 use gameview_module::gameview;
+use std::collections::HashMap;
 
 #[derive(Debug)]
 #[derive(Clone)]
@@ -36,9 +37,9 @@ pub struct Puzzle {
 	pub len: usize,
 	pub numbers: Vec<Number>,
 
-	pub open_list: Vec<Elem>,
-	pub close_list: Vec<Elem>,
 	pub final_list: Vec<Elem>,
+	pub open_list: Vec<Elem>,
+	pub close_l: HashMap<String, Elem>,
 }
 
 impl Puzzle
@@ -98,7 +99,7 @@ impl Puzzle
 		};
 
 		self.open_list.push(elem);
-		self.get_manhattan_heuristic(&finalboard, 0, 0);
+		self.get_manhattan_heuristic(&finalboard, 0);
 
 		self.a_star(&finalboard);
 		// println!("close_list {:?}", close_list);
@@ -107,24 +108,13 @@ impl Puzzle
 
 	fn in_close_list(&self, board: &Vec<Number>) ->(bool)
 	{
-		let mut diff = true;
+		let mut key = String::new();
 
-		'outer: for elem in self.close_list.iter() {
-			diff = false;
-			'inner: for (i, section) in elem.list.iter().enumerate() {
-				// print!("v {} vc {} ", board[i].value, section.value);
-				if board[i].value != section.value {
-					diff = true;
-					break 'inner;
-				}
-			}
-			if diff == false{
-				// println!("\nfalse");
-				return false;
-			}
+		for elem in board.iter() {
+			key += &elem.value.to_string();
 		}
-		// println!("\ntrue");
-		return diff;
+
+		self.close_l.contains_key(&key)
 	}
 
 	fn move_elem(&mut self, finalboard: &Vec<Number>, board: &Vec<Number>, a:usize, b:usize, s: i32, id: i32)
@@ -135,7 +125,7 @@ impl Puzzle
 
 		newboard[a].value = newboard[b].value;
 		newboard[b].value = tmp;
-		if self.in_close_list(&newboard) {
+		if !self.in_close_list(&newboard) {
 			let elem: Elem = Elem {
 				list: newboard.to_vec(),
 				glob_heuristic: 0,
@@ -146,7 +136,7 @@ impl Puzzle
 
 			// need to just modify M heuristic not all of the list
 			self.open_list.push(elem);
-			self.get_manhattan_heuristic(&finalboard, index, s);
+			self.get_manhattan_heuristic(&finalboard, index);
 		}
 	}
 
@@ -180,32 +170,40 @@ impl Puzzle
 		}
 	}
 
+	fn insert_in_final(&self, elem: &Elem, tmp_vec: &mut Vec<Elem>, id: &mut i32, elem_id: &mut i32) -> (bool)
+	{
+		if elem.id == *id {
+			let board: Elem = Elem {
+				list: elem.list.to_vec(),
+				glob_heuristic: elem.glob_heuristic,
+				step: elem.step,
+				id: elem.id,
+				p_id: elem.p_id,
+			};
+			*id = elem.p_id;
+			*elem_id = elem.id;
+			tmp_vec.push(board);
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
 	fn get_final_path(&mut self, last_id: &i32)
 	{
 		let mut id :i32 = *last_id;
 		let mut elem_id :i32 = id;
+		let mut tmp_vec = Vec::new();
 
 		loop {
-			for elem in self.close_list.iter() {
-				if elem.id == id {
-					let board: Elem = Elem {
-						list: elem.list.to_vec(),
-						glob_heuristic: elem.glob_heuristic,
-						step: elem.step,
-						id: elem.id,
-						p_id: elem.p_id,
-					};
-					id = elem.p_id;
-					elem_id = elem.id;
-					self.final_list.push(board);
-					break;
-				}
-			}
+			self.close_l.iter().position(|c_id| self.insert_in_final(&c_id.1, &mut tmp_vec, &mut id, &mut elem_id));
+
 			if elem_id == 0 {
 				break;
 			}
 		}
-
+		self.final_list = tmp_vec;
 		self.final_list.reverse();
 	}
 
@@ -225,16 +223,21 @@ impl Puzzle
 				p_id: self.open_list[index].p_id,
 			};
 
+			let mut key = String::new();
+			for elem in board_study.list.iter() {
+				key += &elem.value.to_string();
+			}
+			// println!("key {}", key);
+
 			if self.open_list[index].glob_heuristic == 0 {
-				self.close_list.push(board_study);
+				self.close_l.insert(key, board_study);
 				self.open_list.iter().enumerate().position(|t| t.0 == index).map(|e| self.open_list.remove(e));
 
 				self.get_final_path(&id);
 				break;
 			}
-
 			self.find_move(&finalboard, &board_study.list, step, id);
-			self.close_list.push(board_study);
+			self.close_l.insert(key, board_study);
 			self.open_list.iter().enumerate().position(|t| t.0 == index).map(|e| self.open_list.remove(e));
 			id += 1;
 		}
@@ -243,7 +246,7 @@ impl Puzzle
 		// println!("len of close_list {:?}", self.close_list.len());
 	}
 
-	fn get_manhattan_heuristic(&mut self, finalboard: &Vec<Number>, index: usize, step: i32)
+	fn get_manhattan_heuristic(&mut self, finalboard: &Vec<Number>, index: usize)
 	{
 		let mut global_h = 0;
 

@@ -33,7 +33,7 @@ fn is_solvable(board: &Puzzle) ->(bool)
 	if board.len == 3 {
 		return puzzle_3_size(board);
 	}
-	return true;
+	return false;
 }
 
 fn main()
@@ -57,7 +57,7 @@ fn main()
 					if puzzle.get_len() >= 3 && puzzle.get_len() <= 20
 					{
 						puzzle.solve_puzzle();
-						window::create_window(puzzle, [885, 950]);
+						// window::create_window(puzzle, [885, 950]);
 					} else {
 						println!("Invalid value or invalid length. (the length must be between 3 - 20)");
 					}

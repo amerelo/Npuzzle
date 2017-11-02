@@ -205,21 +205,7 @@ impl Puzzle
 			}
 		}
 
-		for elem in self.final_list.iter().rev()
-		{
-			let mut y: i32 = 0;
-			for val in elem.list.iter() {
-				if y != val.y_base {
-					y += 1;
-					println!("");
-				}
-				print!("{} ", val.value);
-			}
-			println!("\n");
-		}
-
-		// println!("step {}", self.open_list[index].step);
-		// println!("heuristic {}", heuristic);
+		self.final_list.reverse();
 	}
 
 	fn a_star(&mut self, finalboard: &Vec<Number>)

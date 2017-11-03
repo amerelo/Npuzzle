@@ -5,6 +5,7 @@ use std::io::prelude::*;
 use puzzle_module::puzzle::Puzzle;
 use puzzle_module::puzzle::Number;
 use std::collections::HashMap;
+use std::collections::BinaryHeap;
 
 pub struct Parser
 {
@@ -54,7 +55,8 @@ impl Parser {
 	{
 		let mut numbers_pos: Vec<Number> = vec![];
 		for (_i, &item) in numbers.iter().enumerate() {
-			numbers_pos.push(Number { value: item, x:0.0, y:0.0, h: 0, x_base:0, y_base:0});
+			numbers_pos.push(Number { value: item, x_base: 0, y_base: 0 ,h: 0});
+			// numbers_pos.push(Number { value: item,  x:0.0, y:0.0, h: 0, x_base:0, y_base:0});
 		}
 		return numbers_pos;
 	}
@@ -105,6 +107,6 @@ impl Parser {
 				puzz_len = 0;
 			}
 		}
-		Puzzle { len: puzz_len, numbers: self.convert_numbers(&numbers), open_list: vec![], final_list: vec![], close_l: HashMap::new()}
+		Puzzle { len: puzz_len, numbers: self.convert_numbers(&numbers), final_list: vec![], close_l: HashMap::new(), open_l: BinaryHeap::new(), max_steps: 0}
 	}
 }

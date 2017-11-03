@@ -6,6 +6,8 @@ use puzzle_module::puzzle::Puzzle;
 use puzzle_module::puzzle::Number;
 use std::collections::HashMap;
 use std::collections::BinaryHeap;
+use config_module::config::Config;
+use std::env;
 
 pub struct Parser
 {
@@ -107,6 +109,6 @@ impl Parser {
 				puzz_len = 0;
 			}
 		}
-		Puzzle { len: puzz_len, numbers: self.convert_numbers(&numbers), final_list: vec![], close_l: HashMap::new(), open_l: BinaryHeap::new(), max_steps: 0}
+		Puzzle { len: puzz_len, numbers: self.convert_numbers(&numbers), final_list: vec![], close_l: HashMap::new(), open_l: BinaryHeap::new(), max_steps: 0, config: Config::new(env::args().collect())}
 	}
 }

@@ -1,7 +1,7 @@
-use gameview_module::gameview;
 use std::collections::HashMap;
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
+use config_module::config::Config;
 
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct Number
@@ -52,6 +52,7 @@ impl PartialOrd for Elem {
 pub struct Puzzle {
 	pub len: usize,
 	pub numbers: Vec<Number>,
+	pub config: Config,
 
 	pub final_list: Vec<Elem>,
 	pub open_l: BinaryHeap<Elem>,
@@ -257,7 +258,6 @@ impl Puzzle
 	{
 		let mut id : i32 = 0;
 		loop {
-			println!("step {}", id);
 			let mut board_study: Elem;
 
 			match self.open_l.pop() {
@@ -278,8 +278,6 @@ impl Puzzle
 			// 	print!("{} ", elem.value);
 			// }
 			// println!("");
-
-			println!("id {} p_id {}", board_study.id, board_study.p_id);
 
 			let mut key = String::new();
 			for elem in board_study.list.iter() {

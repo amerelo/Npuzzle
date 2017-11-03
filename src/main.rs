@@ -2,6 +2,7 @@ mod parser_module;
 mod puzzle_module;
 mod window_module;
 mod gameview_module;
+mod checker_module;
 
 extern crate piston_window;
 extern crate opengl_graphics;
@@ -9,32 +10,8 @@ extern crate gfx_device_gl;
 
 use std::env;
 use parser_module::parser::Parser;
-use puzzle_module::puzzle::Puzzle;
 use window_module::window;
-
-fn puzzle_3_size(board: &Puzzle) ->(bool)
-{
-	let mut inv_count: i32 = 0;
-
-	for w in 0..board.numbers.len()
-	{
-		for z in (w + 1)..board.numbers.len()
-		{
-			if board.numbers[w].value > board.numbers[z].value {
-				inv_count += 1;
-			}
-		}
-	}
-	return inv_count % 2 == 0;
-}
-
-fn is_solvable(board: &Puzzle) ->(bool)
-{
-	if board.len == 3 {
-		return puzzle_3_size(board);
-	}
-	return false;
-}
+use checker_module::checker;
 
 fn main()
 {
@@ -50,14 +27,14 @@ fn main()
 			if parser.is_file_valid()
 			{
 				let mut puzzle = parser.parse_puzzle();
-				if is_solvable(&puzzle) {
-					println!("Puzzle not Solvable");
+				if checker::not_solvable(&puzzle) {
+					println!("The puzzle given as argument is not solvable !");
 				}
 				else {
 					if puzzle.get_len() >= 3 && puzzle.get_len() <= 20
 					{
 						puzzle.solve_puzzle();
-						// window::create_window(puzzle, [885, 950]);
+						window::create_window(puzzle, [885, 950]);
 					} else {
 						println!("Invalid value or invalid length. (the length must be between 3 - 20)");
 					}

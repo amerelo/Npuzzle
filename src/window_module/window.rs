@@ -1,6 +1,5 @@
 extern crate find_folder;
 
-use piston_window::*;
 use puzzle_module::puzzle::Puzzle;
 use gameview_module::gameview;
 use puzzle_module::puzzle::Number;

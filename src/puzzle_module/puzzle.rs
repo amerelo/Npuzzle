@@ -128,8 +128,8 @@ impl Puzzle
 	fn a_star(&mut self, finalboard: &Vec<Number>)
 	{
 		let mut id : i32 = 0;
-		for x in 0..5 {
-		// loop {
+		// for x in 0..5 {
+		loop {
 			println!("\nstep {}", id);
 			let mut board_study: Elem;
 

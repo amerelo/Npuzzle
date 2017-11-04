@@ -3,6 +3,7 @@ mod puzzle_module;
 mod window_module;
 mod gameview_module;
 mod checker_module;
+mod config_module;
 
 extern crate piston_window;
 extern crate opengl_graphics;
@@ -17,7 +18,7 @@ fn main()
 {
 	let args: Vec<String> = env::args().collect();
 
-	if args.len() == 2
+	if args.len() >= 2
 	{
 		let file_path = &args[1];
 		if file_path.len() > 0
@@ -33,8 +34,13 @@ fn main()
 				else {
 					if puzzle.get_len() >= 3 && puzzle.get_len() <= 20
 					{
+						// match puzzle.config.get_flag("heuristic")
+						// {
+						// 	Some(result) => { println!{"Result: {}", result}; }
+						// 	None => { }
+						// }
 						puzzle.solve_puzzle();
-						window::create_window(puzzle, [885, 950]);
+						// window::create_window(puzzle, [885, 950]);
 					} else {
 						println!("Invalid value or invalid length. (the length must be between 3 - 20)");
 					}

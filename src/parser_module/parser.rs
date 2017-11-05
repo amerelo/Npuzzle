@@ -70,6 +70,9 @@ impl Parser {
 		let lines = self.content.lines();
 		for tuple in lines.enumerate() {
 			let line = tuple.1;
+			if line.len() == 0 {
+				continue;
+			}
 			let ch = line.chars().nth(0).unwrap();
 			if ch != '#' {
 				if puzz_len == 0 && !line.contains(" ") && !line.contains("\t") {
@@ -96,7 +99,7 @@ impl Parser {
 						puzz_len = 0;
 					}
 				}
-			} else {
+			} else if line.len() > 1 {
 				println!("Information: {}", line);
 			}
 			if lines_count > puzz_len {

@@ -7,8 +7,6 @@ use std::collections::BinaryHeap;
 pub struct Number
 {
 	pub value: i32,
-	// pub x: f64,
-	// pub y: f64,
 	pub x_base: i32,
 	pub y_base: i32,
 	pub h: i32,
@@ -24,6 +22,21 @@ impl Number {
 		self.y_base = y_base;
 	}
 }
+
+
+pub struct Pos
+{
+	pub value: i32,
+	pub x: f64,
+	pub y: f64,
+}
+
+pub struct Last
+{
+	pub final_list: Vec<Pos>,
+
+}
+
 
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct Elem {
@@ -55,9 +68,9 @@ pub struct Puzzle {
 	pub len: usize,
 	pub numbers: Vec<Number>,
 
-	pub final_list: Vec<Elem>,
 	pub open_l: BinaryHeap<Elem>,
 	pub close_l: HashMap<String, Elem>,
+	pub final_info: Last,
 }
 
 impl Puzzle
@@ -265,8 +278,8 @@ impl Puzzle
 		while id != 0 {
 			self.close_l.iter().position(|c_id| self.insert_in_final(&c_id.1, &mut tmp_vec, &mut id, &mut pa_id));
 		}
-		self.final_list = tmp_vec;
-		self.final_list.reverse();
+		// self.final_list = tmp_vec;
+		// self.final_list.reverse();
 		// let mut y: i32;
 		// for obj in self.final_list.iter() {
 		// 	y = 0;
@@ -280,7 +293,7 @@ impl Puzzle
 		// 	}
 		// 	println!("\n");
 		// }
-		println!("steps {}", self.final_list.len() - 1);
+		// println!("steps {}", self.final_list.len() - 1);
 		// println!("heuristic {}", heuristic);
 	}
 

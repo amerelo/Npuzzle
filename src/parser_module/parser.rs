@@ -110,6 +110,6 @@ impl Parser {
 			}
 		}
 		// Puzzle { len: puzz_len, numbers: self.convert_numbers(&numbers), final_list: vec![], close_l: HashMap::new(), open_l: BinaryHeap::new(), max_steps: 0, config: Config::new(env::args().collect())}
-		Puzzle { len: puzz_len, numbers: self.convert_numbers(&numbers), final_list: vec![], close_l: HashMap::new(), open_l: BinaryHeap::new(), max_steps: 0}
+		Puzzle { len: puzz_len, numbers: self.convert_numbers(&numbers), final_list: vec![], close_l: HashMap::new(), open_l: BinaryHeap::new()}
 	}
 }

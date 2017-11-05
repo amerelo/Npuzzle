@@ -28,10 +28,7 @@ fn main()
 			if parser.is_file_valid()
 			{
 				let mut puzzle = parser.parse_puzzle();
-				if checker::not_solvable(&puzzle) {
-					println!("The puzzle given as argument is not solvable !");
-				}
-				else {
+				if checker::solvable(&puzzle) {
 					if puzzle.get_len() >= 3 && puzzle.get_len() <= 20
 					{
 						// match puzzle.config.get_flag("heuristic")
@@ -44,6 +41,8 @@ fn main()
 					} else {
 						println!("Invalid value or invalid length. (the length must be between 3 - 20)");
 					}
+				} else {
+					println!("The puzzle given as argument is not solvable !");
 				}
 			} else {
 				println!("The file {} is not valid.", parser.get_file());

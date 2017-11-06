@@ -2,6 +2,8 @@ use gameview_module::gameview;
 use std::collections::HashMap;
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
+use config_module::config::Config;
+use std::time::Instant;
 
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct Number
@@ -12,31 +14,12 @@ pub struct Number
 	pub h: i32,
 }
 
-impl Number {
-	// pub fn update_pos(&mut self, x: f64, y: f64) {
-	// 	self.x = x;
-	// 	self.y = y;
-	// }
-	pub fn update_base(&mut self, x_base: i32, y_base: i32) {
-		self.x_base = x_base;
-		self.y_base = y_base;
-	}
-}
-
-
+#[derive(Debug)]
 pub struct Pos
 {
-	pub value: i32,
 	pub x: f64,
 	pub y: f64,
 }
-
-pub struct Last
-{
-	pub final_list: Vec<Pos>,
-
-}
-
 
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct Elem {
@@ -48,12 +31,23 @@ pub struct Elem {
 	pub p_id: i32,
 }
 
+pub struct Puzzle {
+	pub len: usize,
+	pub numbers: Vec<Number>,
+	pub config: Config,
+	pub base_pos: Vec<Pos>,
+
+	pub open_l: BinaryHeap<Elem>,
+	pub close_l: HashMap<String, Elem>,
+	pub final_list: Vec<Elem>,
+}
+
 impl Ord for Elem {
 	fn cmp(&self, other: &Elem) -> Ordering {
-		// other.glob_heuristic.cmp(&self.glob_heuristic)
+		other.glob_heuristic.cmp(&self.glob_heuristic)
 
-		other.total_cost.cmp(&self.total_cost)
-		.then_with(|| other.glob_heuristic.cmp(&self.glob_heuristic))
+		// other.total_cost.cmp(&self.total_cost)
+		// .then_with(|| other.glob_heuristic.cmp(&self.glob_heuristic))
 		// .then_with(|| other.step.cmp(&self.step))
 	}
 }
@@ -64,23 +58,17 @@ impl PartialOrd for Elem {
 	}
 }
 
-pub struct Puzzle {
-	pub len: usize,
-	pub numbers: Vec<Number>,
-
-	pub open_l: BinaryHeap<Elem>,
-	pub close_l: HashMap<String, Elem>,
-	pub final_info: Last,
+impl Number {
+	pub fn update_base(&mut self, x_base: i32, y_base: i32) {
+		self.x_base = x_base;
+		self.y_base = y_base;
+	}
 }
 
 impl Puzzle
 {
-	pub fn init_pos(&mut self) -> ()
+	pub fn init_array_positions(&mut self) -> ()
 	{
-		// let square_len: f64 = gameview::get_square_len(&self, [0.0; 2], 880.0);
-		// let start = [square_len / 2.0, square_len / 2.0];
-		// let mut y: f64 = start[1];
-		// let mut x: f64;
 		let mut l: usize = 0;
 		let mut base_x: i32 = 0;
 		let mut base_y: i32 = 0;
@@ -88,23 +76,36 @@ impl Puzzle
 
 		for element in self.get_numbers().iter_mut() {
 			if l == puzzle_len {
-				// x = square_len / 2.0;
-				// y += square_len;
 				l = 0;
 				base_y += 1;
 				base_x = 0;
 			}
-			//  else {
-			// 	x = start[0] + l as f64 / puzzle_len as f64 * 880.0;
-			// }
-			// if element.value != 0 {
-			// 	element.update_pos(x, y);
-			// } else {
-				// element.update_pos(x - 20.0, y - 20.0);
-			// }
 			element.update_base(base_x, base_y);
 			l += 1;
 			base_x += 1;
+		}
+	}
+
+	pub fn init_graphics_positions(&mut self) -> ()
+	{
+		let square_len: f64 = gameview::get_square_len(&self, [0.0; 2], 880.0);
+		let start = [square_len / 2.0, square_len / 2.0];
+		let mut y: f64 = start[1];
+		let mut x: f64;
+		let mut l: usize = 0;
+		let puzzle_len = self.get_len();
+
+		for _element in self.numbers.iter() {
+			if l == puzzle_len {
+				x = square_len / 2.0;
+				y += square_len;
+				l = 0;
+			}
+			 else {
+				x = start[0] + l as f64 / puzzle_len as f64 * 880.0;
+			}
+			self.base_pos.push(Pos {x: x, y: y});
+			l += 1;
 		}
 	}
 
@@ -116,11 +117,19 @@ impl Puzzle
 		&mut self.numbers
 	}
 
+	pub fn print_time_elapsed(&self, time: Instant) -> ()
+	{
+		let elapsed = time.elapsed();
+    	let sec = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0);
+		println!("Puzzle solved in {:.2} seconds, starting the graphic ui..", sec);
+	}
+
 	pub fn solve_puzzle(&mut self)
 	{
+		let now = Instant::now();
 		println!("Solving the puzzle...");
-		self.init_pos(); // init Vec<Number> with value and graphics positions
-		// println!("{:?}", self.numbers);
+		self.init_array_positions();
+		self.init_graphics_positions();
 		let finalboard: Vec<Number> = self.get_last_pos(self.len as i32);
 		let mut elem: Elem = Elem {
 			list: self.numbers.to_vec(),
@@ -135,6 +144,7 @@ impl Puzzle
 		self.open_l.push(elem);
 
 		self.a_star(&finalboard);
+		self.print_time_elapsed(now);
 	}
 
 	fn a_star(&mut self, finalboard: &Vec<Number>)
@@ -142,7 +152,7 @@ impl Puzzle
 		let mut id : i32 = 0;
 		// for x in 0..10 {
 		loop {
-			println!("\nstep {}", id);
+			// println!("\nstep {}", id);
 			let mut board_study: Elem;
 
 			match self.open_l.pop() {
@@ -155,16 +165,16 @@ impl Puzzle
 				// println!("h {}", board_study.glob_heuristic);
 				// println!("steps {} \n", step);
 				// self.get_manhattan_heuristic(&finalboard, &mut board_study);
-
-				let mut y = 0;
-				for elem in board_study.list.iter(){
-					if y != elem.y_base {
-						y += 1;
-						println!("");
-					}
-					print!("{} ", elem.value);
-				}
-				println!("");
+				// self.final_list.push(board_study.clone());
+				// let mut y = 0;
+				// for elem in board_study.list.iter(){
+				// 	if y != elem.y_base {
+				// 		y += 1;
+				// 		println!("");
+				// 	}
+				// 	print!("{} ", elem.value);
+				// }
+				// println!("");
 
 				let mut key = String::new();
 				for elem in board_study.list.iter() {
@@ -278,8 +288,8 @@ impl Puzzle
 		while id != 0 {
 			self.close_l.iter().position(|c_id| self.insert_in_final(&c_id.1, &mut tmp_vec, &mut id, &mut pa_id));
 		}
-		// self.final_list = tmp_vec;
-		// self.final_list.reverse();
+		self.final_list = tmp_vec;
+		self.final_list.reverse();
 		// let mut y: i32;
 		// for obj in self.final_list.iter() {
 		// 	y = 0;

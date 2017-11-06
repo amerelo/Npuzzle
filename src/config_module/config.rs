@@ -20,7 +20,7 @@ impl Config
 {
 	pub fn parse_args(&mut self) -> ()
 	{
-		for (i, item) in self.argv.iter().enumerate() {
+		for item in self.argv.iter() {
 			if item.substring(0, 2) == "--" {
 				let datas = item.substring(2, item.len());
 				let split: Vec<&str> = datas.split('=').collect();
@@ -34,7 +34,7 @@ impl Config
 	pub fn get_flag(&self, flag: &'static str) -> (Option<String>)
 	{
 		for (key, val) in &self.flags {
-			if (key == flag) {
+			if key == flag {
 				return Some(val.clone());
 			}
 		}

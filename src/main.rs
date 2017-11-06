@@ -31,13 +31,8 @@ fn main()
 				if checker::solvable(&puzzle) {
 					if puzzle.get_len() >= 3 && puzzle.get_len() <= 20
 					{
-						// match puzzle.config.get_flag("heuristic")
-						// {
-						// 	Some(result) => { println!{"Result: {}", result}; }
-						// 	None => { }
-						// }
 						puzzle.solve_puzzle();
-						// window::create_window(puzzle, [885, 950]);
+						window::create_window(puzzle, [885, 950]);
 					} else {
 						println!("Invalid value or invalid length. (the length must be between 3 - 20)");
 					}

@@ -3,8 +3,6 @@ use std::io::prelude::*;
 
 // use puzzle;
 use puzzle_module::puzzle::Puzzle;
-use puzzle_module::puzzle::Last;
-use puzzle_module::puzzle::Pos;
 use puzzle_module::puzzle::Number;
 use std::collections::HashMap;
 use std::collections::BinaryHeap;
@@ -114,7 +112,6 @@ impl Parser {
 				puzz_len = 0;
 			}
 		}
-		// Puzzle { len: puzz_len, numbers: self.convert_numbers(&numbers), final_list: vec![], close_l: HashMap::new(), open_l: BinaryHeap::new(), max_steps: 0, config: Config::new(env::args().collect())}
-		Puzzle { len: puzz_len, numbers: self.convert_numbers(&numbers), final_info: Last{ final_list: vec![]}, close_l: HashMap::new(), open_l: BinaryHeap::new()}
+		Puzzle { len: puzz_len, numbers: self.convert_numbers(&numbers), final_list: vec![], close_l: HashMap::new(), open_l: BinaryHeap::new(), config: Config::new(env::args().collect()), base_pos: vec![]}
 	}
 }

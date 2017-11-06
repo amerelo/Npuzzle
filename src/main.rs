@@ -13,6 +13,28 @@ use std::env;
 use parser_module::parser::Parser;
 use window_module::window;
 use checker_module::checker;
+use puzzle_module::puzzle::Puzzle;
+use std::process;
+
+fn check_print_help(puzzle: &Puzzle)
+{
+	match puzzle.config.get_flag("help")
+	{
+		Some(_flag) => {
+			println!("Npuzzle [OPTIONS]");
+			println!("");
+			println!("--help Print this help screen");
+			println!("--time Specifies the time to wait for the graphic display");
+			println!("--options Options to use on heuristics");
+			println!("\t-g (Greedy)");
+			println!("\t-h (Hamming)");
+			println!("\t-l (Linear Conflict)");
+			println!("\t-t (Tiles out of row and column)");
+			process::exit(0x0100);
+		}
+		None => { }
+	}
+}
 
 fn main()
 {
@@ -28,6 +50,7 @@ fn main()
 			if parser.is_file_valid()
 			{
 				let mut puzzle = parser.parse_puzzle();
+				check_print_help(&puzzle);
 				if checker::solvable(&puzzle) {
 					if puzzle.get_len() >= 3 && puzzle.get_len() <= 20
 					{

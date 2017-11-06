@@ -5,6 +5,11 @@ use std::collections::BinaryHeap;
 use config_module::config::Config;
 use std::time::Instant;
 
+static GREEDY: char = 'g';
+static HAMMING: char = 'h';
+static LINEAR_CONFLICT: char = 'l';
+static TILES_OUT_OF_ROW_AND_COLUMN: char = 't';
+
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub struct Number
 {
@@ -37,6 +42,7 @@ pub struct Puzzle {
 	pub config: Config,
 	pub base_pos: Vec<Pos>,
 
+	pub greedy: i32,
 	pub open_l: BinaryHeap<Elem>,
 	pub close_l: HashMap<String, Elem>,
 	pub final_list: Vec<Elem>,
@@ -44,11 +50,9 @@ pub struct Puzzle {
 
 impl Ord for Elem {
 	fn cmp(&self, other: &Elem) -> Ordering {
-		other.glob_heuristic.cmp(&self.glob_heuristic)
-
-		// other.total_cost.cmp(&self.total_cost)
-		// .then_with(|| other.glob_heuristic.cmp(&self.glob_heuristic))
-		// .then_with(|| other.step.cmp(&self.step))
+		//other.glob_heuristic.cmp(&self.glob_heuristic)
+		other.total_cost.cmp(&self.total_cost)
+		.then_with(|| other.glob_heuristic.cmp(&self.glob_heuristic))
 	}
 }
 
@@ -127,6 +131,8 @@ impl Puzzle
 	pub fn solve_puzzle(&mut self)
 	{
 		let now = Instant::now();
+		self.greedy = !self.config.has_option(GREEDY) as i32;
+
 		println!("Solving the puzzle...");
 		self.init_array_positions();
 		self.init_graphics_positions();
@@ -140,7 +146,7 @@ impl Puzzle
 			p_id: 0,
 		};
 
-		self.get_manhattan_heuristic(&finalboard, &mut elem);
+		self.get_heuristics(&finalboard, &mut elem);
 		self.open_l.push(elem);
 
 		self.a_star(&finalboard);
@@ -150,14 +156,12 @@ impl Puzzle
 	fn a_star(&mut self, finalboard: &Vec<Number>)
 	{
 		let mut id : i32 = 0;
-		// for x in 0..10 {
 		loop {
-			// println!("\nstep {}", id);
 			let mut board_study: Elem;
 
 			match self.open_l.pop() {
 				Some(elem) => {board_study = elem},
-				None => {return},
+				None => { break; },
 			}
 			if !self.in_close_list(&board_study.list) {
 				board_study.id = id;
@@ -184,16 +188,15 @@ impl Puzzle
 				if board_study.glob_heuristic <= 0 {
 					self.close_l.insert(key, board_study);
 					self.get_final_path(&id);
-					return;
+					break;
 				}
 				self.find_move(&finalboard, &mut board_study, step);
 				self.close_l.insert(key, board_study);
 			}
 			id += 1;
 		}
-		// println!("Maximum number of states ever represented in memory {}", id);
-		// println!("len of open_list {:?}", self.open_list.len());
-		// println!("len of close_list {:?}", self.close_list.len());
+		println!("Maximum number of states ever represented in memory {}", id);
+		println!("Total number of states ever selected in the opened set {}", self.close_l.len());
 	}
 
 	fn in_close_list(&self, board: &Vec<Number>) ->(bool)
@@ -209,14 +212,9 @@ impl Puzzle
 	fn move_elem(&mut self, finalboard: &Vec<Number>, board: &Elem, z:usize, o:usize, s: i32)
 	{
 		let mut newboard: Vec<Number> = board.list.to_vec();
-		// let heuristic_o = ((newboard[z].x_base - finalboard[newboard[o].value as usize - 1].x_base).abs()
-		// + (newboard[z].y_base - finalboard[newboard[o].value as usize - 1].y_base).abs()) - newboard[o].h;
-
-		// println!("zero {} , other {}", newboard[z].value, newboard[o].value);
 		newboard[z].value = newboard[o].value;
 		newboard[o].value = 0;
-		// newboard[z].h = newboard[o].h;
-		// newboard[o].h = 0;
+
 		if !self.in_close_list(&newboard) {
 			let mut elem: Elem = Elem {
 				list: newboard,
@@ -226,7 +224,7 @@ impl Puzzle
 				id: 0,
 				p_id: board.id,
 			};
-			self.get_manhattan_heuristic(&finalboard, &mut elem);
+			self.get_heuristics(&finalboard, &mut elem);
 			self.open_l.push(elem);
 		}
 	}
@@ -290,21 +288,6 @@ impl Puzzle
 		}
 		self.final_list = tmp_vec;
 		self.final_list.reverse();
-		// let mut y: i32;
-		// for obj in self.final_list.iter() {
-		// 	y = 0;
-		// 	for elem in obj.list.iter(){
-		// 	// for elem in self.final_list[0].list.iter(){
-		// 		if y != elem.y_base {
-		// 			y += 1;
-		// 			println!("");
-		// 		}
-		// 		print!("{} ", elem.value);
-		// 	}
-		// 	println!("\n");
-		// }
-		// println!("steps {}", self.final_list.len() - 1);
-		// println!("heuristic {}", heuristic);
 	}
 
 	fn get_linear_conflict(&mut self, finalboard: &Vec<Number>, val: &Number, obj: &Number, tab: &Vec<Number>, index: usize) ->(i32)
@@ -323,14 +306,13 @@ impl Puzzle
 		return lc;
 	}
 
-	fn get_manhattan_heuristic(&mut self, finalboard: &Vec<Number>, elem: &mut Elem)
+	fn get_heuristics(&mut self, finalboard: &Vec<Number>, elem: &mut Elem)
 	{
 		let mut lc;
 		let mut dif_x;
 		let mut dif_y;
 		let mut global_h = 0;
 
-		// println!("Manhattan");
 		for (i, e) in elem.list.iter().enumerate()
 		{
 			lc = 0;
@@ -339,35 +321,29 @@ impl Puzzle
 				dif_x = (e.x_base - finalboard[e.value as usize - 1].x_base).abs();
 				dif_y = (e.y_base - finalboard[e.value as usize - 1].y_base).abs();
 
-				// Tiles out of row and column / Hamming
-				// put flag condition
-				// if dif_x != 0 || dif_y != 0 {
-				// 	if dif_x != 0 {
-				// 		lc += 1;
-				// 	}
-				// 	if dif_y != 0 {
-				// 		lc += 1;
-				// 	}
-				// 	lc += 1;
-				// }
-				// Linear Conflict
-				if e.y_base == finalboard[e.value as usize - 1].y_base{
+				if self.config.has_option(TILES_OUT_OF_ROW_AND_COLUMN) {
+					if dif_x != 0 {
+						lc += 1;
+					}
+					if dif_y != 0 {
+						lc += 1;
+					}
+				}
+				if self.config.has_option(HAMMING) && dif_x != 0 || dif_y != 0 {
+					lc += 1;
+				}
+				if self.config.has_option(LINEAR_CONFLICT) && e.y_base == finalboard[e.value as usize - 1].y_base {
 					lc += self.get_linear_conflict(&finalboard , &e, &finalboard[e.value as usize - 1], &elem.list, i);
-					// println!("lc {} for value {}", lc, e.value);
 				}
 
 				// Manhattan
 				lc += dif_x + dif_y;
 				global_h += lc;
-				// if e.h != 0 {
-				// 	println!("value of conflict {} , h {}", e.value, e.h);
-				// }
 			}
 		}
 
 		elem.glob_heuristic = global_h;
-		elem.total_cost = global_h + (elem.step * 0);
-		// println!("G_heuristic {} step {} total {}", elem.glob_heuristic , elem.step, elem.total_cost);
+		elem.total_cost = global_h + (elem.step * self.greedy);
 	}
 
 	fn get_last_pos(&self, size: i32) -> (Vec<Number>)

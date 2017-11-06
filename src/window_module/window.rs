@@ -41,6 +41,30 @@ pub fn get_step_display(numbers: &Vec<Number>, puzzle: &Puzzle) -> (Vec<DisplayN
 	return displays;
 }
 
+pub fn get_time_to_wait(puzzle: &Puzzle, default_value: u64) -> (u64)
+{
+	match puzzle.config.get_flag("time")
+	{
+		Some (value) => {
+			match value.parse::<u64>() {
+				Ok (number) => {
+					if number > 0 {
+						return number;
+					} else {
+						return default_value;
+					}
+				}
+				Err(_error) => {
+					return default_value;
+				}
+			}
+		},
+		None => {
+			return default_value;
+		}
+	}
+}
+
 pub fn create_window(puzzle: Puzzle, window_size: [u32; 2])
 {
 	let mut window: PistonWindow = WindowSettings::new ("Npuzzle", window_size)
@@ -54,8 +78,7 @@ pub fn create_window(puzzle: Puzzle, window_size: [u32; 2])
 	let ref font = assets.join("FiraSans-Regular.ttf");
 	let factory = window.factory.clone();
 	let mut glyphs = Glyphs::new(font, factory, TextureSettings::new()).unwrap();
-	//let flag = Some(puzzle.config.get_flag("time"));
-	let ten_millis = time::Duration::from_millis(200);
+	let ten_millis = time::Duration::from_millis(get_time_to_wait(&puzzle, 200));
 
 	let elems: &Vec<Elem> = &puzzle.final_list;
 	let mut last_value: Vec<DisplayNumber> = vec![];
